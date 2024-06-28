@@ -1,64 +1,142 @@
-import prisma from "@/lib/db"
-export default async function User() {
+// /app/page.tsx
 
-    const users = await prisma.user.findMany();
+"use client";
+import styles from "./user.module.scss";
 
-    return (
-        <div>
-            <h1>User sidan</h1>
-           {users.map((user) => (
-            <div> Hej: {user.name}</div>
-           ))}
-        </div>
-    )
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../redux/store";
+import {
+  addUser,
+  removeUser,
+  setUser,
+  updateUser,
+} from "../redux/feature/users/userSlice";
+import Header from "@/components/Header";
+
+interface User {
+  id: number;
+  name: string;
 }
-// "use client";
 
-// import { useEffect, useState } from 'react';
+export default function Home() {
+  const dispatch = useDispatch();
+  const users = useSelector((state: RootState) => state.user.users);
+  const [name, setName] = useState("");
+  const [editId, setEditId] = useState<number | null>(null);
 
-// interface User {
-//   id: number;
-//   name: string;
-//   email: string;
-// }
+  useEffect(() => {
+    fetch("/api/users")
+      .then((response) => response.json())
+      .then((data) => dispatch(setUser(data)))
+      .catch((error) => console.error("Error fetching users:", error));
+  }, [dispatch]);
 
-// export default function Home() {
-//   const [users, setUsers] = useState<User[]>([]);
-//   const [loading, setLoading] = useState<boolean>(true);
-//   const [error, setError] = useState<string | null>(null);
+  const handleDeleteUser = async (id: number) => {
+    try {
+      const response = await fetch("/api/users", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id }),
+      });
 
-//   useEffect(() => {
-//     const fetchUsers = async () => {
-//       try {
-//         const response = await fetch('/api/users');
-//         if (!response.ok) {
-//           throw new Error('Network response was not ok');
-//         }
-//         const data: User[] = await response.json();
-//         setUsers(data);
-//       } catch (error: any) {
-//         setError(error.message);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
+      if (response.ok) {
+        dispatch(removeUser(id));
+      } else {
+        console.error("Error deleting user");
+      }
+    } catch (error) {
+      console.error("Error deleting user:", error);
+    }
+  };
 
-//     fetchUsers();
-//   }, []);
+  const handleAddUser = async () => {
+    try {
+      const response = await fetch("/api/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name }),
+      });
 
-//   if (loading) return <div>Loading...</div>;
-//   if (error) return <div>Error: {error}</div>;
+      if (response.ok) {
+        const newUser = await response.json();
+        dispatch(addUser(newUser));
+        setName("");
+      } else {
+        console.error("Error creating user");
+      }
+    } catch (error) {
+      console.error("Error creating user:", error);
+    }
+  };
 
-//   return (
-//     <div>
-//       <h1>Users</h1>
-//       {users.map((user) => (
-//         <div key={user.id}>
-//           <h2>{user.name}</h2>
-//           <p>{user.email}</p>
-//         </div>
-//       ))}
-//     </div>
-//   );
-// }
+  const handleEditUser = (user: User) => {
+    setEditId(user.id);
+    setName(user.name);
+  };
 
+  const handleUpdateUser = async () => {
+    if (editId === null) return;
+
+    try {
+      const response = await fetch("/api/users", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: editId, name }),
+      });
+
+      if (response.ok) {
+        const updatedUser = await response.json();
+        dispatch(updateUser(updatedUser));
+        setEditId(null);
+        setName("");
+      } else {
+        console.error("Error updating user");
+      }
+    } catch (error) {
+      console.error("Error updating user:", error);
+    }
+  };
+
+  return (
+    <>
+      <Header title="PekkaLi memory map app" url="/Eva-Li.jpg" />
+      <div className={styles.user}>
+        <h1>Users</h1>
+        <div>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <button onClick={editId ? handleUpdateUser : handleAddUser}>
+            {editId ? "Update" : "Add"} User
+          </button>
+          {editId && (
+            <button
+              onClick={() => {
+                setEditId(null);
+                setName("");
+              }}
+            >
+              Cancel
+            </button>
+          )}
+        </div>
+        {users.map((user) => (
+          <div key={user.id}>
+            <h2>{user.name}</h2>
+            <button onClick={() => handleEditUser(user)}>Edit</button>
+            <button onClick={() => handleDeleteUser(user.id)}>Delete</button>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}

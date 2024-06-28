@@ -1,0 +1,50 @@
+@import "../styles//varables.scss";
+
+.header {
+    height: 175px;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr auto; /* En kolumn tar upp resten av utrymmet, den andra är för bilden */
+    align-items: center;
+    background-color: rgb(181, 176, 176);
+    color: white;
+    padding: 0 20px; /* Justera padding för att hålla avstånd från kanterna */
+
+    h1 {
+        justify-self: center; /* Placera titeln i mitten av sin kolumn */
+        font-size: 30px;
+        font-weight: bold;
+        color: $color-pink;
+    }
+
+    .image-wrapper {
+        justify-self: end; /* Placera bilden längst till höger */
+        display: flex;
+        align-items: center; /* Centrera innehållet vertikalt */
+        width: 110px; /* Bredden på bilden */
+        height: 110px; /* Höjden på bilden */
+        position: relative; /* Lägg till position relativ för att kunna centrera text */
+
+        img {
+            border: 2px solid green;
+            border-radius: 50%;
+            width: 100%; /* Sätt bilden att ta hela utrymmet i wrapper */
+            height: 100%; /* Sätt bilden att ta hela utrymmet i wrapper */
+            object-fit: cover; /* Hantera bilden för att täcka utrymmet utan att deformeras */
+        }
+
+        .alt-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 14px; /* Justera textstorlek efter behov */
+            color: white; /* Anpassa textfärg efter behov */
+            pointer-events: none; /* Förhindra att texten fångar interaktioner */
+            border: 2px solid rgb(59, 100, 59);
+            border-radius: 50%;
+            padding: 25px;
+ 
+        }
+    }
+}

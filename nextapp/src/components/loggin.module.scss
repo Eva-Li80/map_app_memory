@@ -1,12 +1,11 @@
 @import "../styles//varables.scss";
-
-.main{
+.loggin{
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
-}
-.hometitle{
-    color: $color-pink;
-    font-size: 25px;
+    margin-top: 100px;
+    background-color: $color-pink;
+    width: 30%;
+    height: 500px;
 }
