@@ -24,7 +24,7 @@ model Post {
   id       Int      @id @default(autoincrement())
   title    String
   content  String
-  url      String
+  url      String?
   userId   Int
   user     User     @relation("UserPosts", fields: [userId], references: [id])
 }

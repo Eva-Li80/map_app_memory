@@ -12,7 +12,9 @@ import {
   setUser,
   updateUser,
 } from "../redux/feature/users/userSlice";
-import Header from "@/components/Header";
+import Header from "../../components/Header";
+import React from "react";
+
 
 interface User {
   id: number;
